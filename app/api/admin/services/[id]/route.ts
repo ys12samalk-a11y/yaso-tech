@@ -8,6 +8,7 @@ export async function GET(
 ) {
   try {
     if (!supabaseAdmin) {
+      console.error("GET Error: Supabase Admin not initialized");
       return NextResponse.json(
         { error: "السيرفر غير مهيأ" },
         { status: 500 }
@@ -15,6 +16,7 @@ export async function GET(
     }
 
     const { id } = await params;
+    console.log("Fetching service with ID:", id);
 
     const { data, error } = await supabaseAdmin
       .from("services")
@@ -22,7 +24,13 @@ export async function GET(
       .eq("id", id)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase GET error:", error);
+      return NextResponse.json(
+        { error: "خطأ في قاعدة البيانات", details: error.message },
+        { status: 500 }
+      );
+    }
 
     if (!data) {
       return NextResponse.json(
@@ -32,10 +40,10 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, service: data });
-  } catch (error) {
-    console.error("Fetch service error:", error);
+  } catch (error: any) {
+    console.error("Catch GET error:", error);
     return NextResponse.json(
-      { error: "حدث خطأ في السيرفر" },
+      { error: "حدث خطأ في السيرفر", details: error?.message || "Unknown error" },
       { status: 500 }
     );
   }
@@ -111,7 +119,13 @@ export async function PATCH(
       .select()
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase PATCH error:", error);
+      return NextResponse.json(
+        { error: "خطأ في قاعدة البيانات", details: error.message },
+        { status: 500 }
+      );
+    }
 
     if (!data) {
       return NextResponse.json(
@@ -121,10 +135,10 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true, service: data });
-  } catch (error) {
-    console.error("Update service error:", error);
+  } catch (error: any) {
+    console.error("Catch PATCH error:", error);
     return NextResponse.json(
-      { error: "حدث خطأ في السيرفر" },
+      { error: "حدث خطأ في السيرفر", details: error?.message || "Unknown error" },
       { status: 500 }
     );
   }
