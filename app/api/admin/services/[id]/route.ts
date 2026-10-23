@@ -17,7 +17,6 @@ export async function GET(
 
     const { id } = await params;
     console.log("🔍 [GET] Fetching service with ID:", id);
-    console.log("🔍 [GET] ID length:", id?.length);
 
     const { data, error } = await supabaseAdmin
       .from("services")
@@ -66,12 +65,8 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    // 🔍 تشخيص
     console.log("🔍 [PATCH] ========== START ==========");
     console.log("🔍 [PATCH] ID from URL:", id);
-    console.log("🔍 [PATCH] ID length:", id?.length);
-    console.log("🔍 [PATCH] ID type:", typeof id);
-    console.log("🔍 [PATCH] Body keys:", Object.keys(body));
 
     // التحقق من الـ slug لو اتغير
     if (body.slug) {
@@ -98,37 +93,29 @@ export async function PATCH(
       }
     }
 
-    // تحديث
+    // تحضير البيانات
     const updates: any = {
       ...body,
       updated_at: new Date().toISOString(),
     };
 
-    // تأكد إن السعر رقم
     if (updates.price !== undefined) {
       updates.price = Number(updates.price);
     }
-
-    // تأكد إن media_files array
     if (updates.media_files !== undefined && !Array.isArray(updates.media_files)) {
       updates.media_files = [];
     }
-
-    // تأكد إن features array
     if (updates.features !== undefined && !Array.isArray(updates.features)) {
       updates.features = [];
     }
 
-    // 🔍 التحقق من وجود الخدمة قبل التحديث
+    // 🔍 التحقق من وجود الخدمة
     console.log("🔍 [PATCH] Checking if service exists...");
     const { data: checkData, error: checkError } = await supabaseAdmin
       .from("services")
-      .select("id, title_ar")
+      .select("id")
       .eq("id", id)
       .maybeSingle();
-
-    console.log("🔍 [PATCH] Check result:", checkData);
-    console.log("🔍 [PATCH] Check error:", checkError);
 
     if (checkError) {
       console.error("❌ [PATCH] Check error:", checkError);
@@ -140,46 +127,49 @@ export async function PATCH(
 
     if (!checkData) {
       console.log("❌ [PATCH] Service NOT found with ID:", id);
-      console.log("❌ [PATCH] ID length was:", id?.length);
       return NextResponse.json(
-        {
-          error: "لم يتم العثور على الخدمة لتحديثها",
-          details: `ID: ${id} (length: ${id?.length})`,
-        },
+        { error: "لم يتم العثور على الخدمة لتحديثها" },
         { status: 404 }
       );
     }
 
-    console.log("✅ [PATCH] Service found:", checkData.title_ar);
-    console.log("🔍 [PATCH] Updating now...");
+    console.log("✅ [PATCH] Service found, updating now...");
 
-    // ⚠️ التحديث
-    const { data, error } = await supabaseAdmin
+    // ✅ التحديث بدون .select() (عشان نتجنب مشكلة عدم إرجاع البيانات)
+    const { error: updateError } = await supabaseAdmin
       .from("services")
       .update(updates)
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("❌ [PATCH] Update error:", updateError);
+      return NextResponse.json(
+        { error: "خطأ في تحديث البيانات", details: updateError.message },
+        { status: 500 }
+      );
+    }
+
+    console.log("✅ [PATCH] Update succeeded, fetching fresh data...");
+
+    // ✅ جلب البيانات المحدثة في طلب منفصل
+    const { data: freshData, error: fetchError } = await supabaseAdmin
+      .from("services")
+      .select("*")
       .eq("id", id)
-      .select()
       .maybeSingle();
 
-    if (error) {
-      console.error("❌ [PATCH] Update error:", error);
+    if (fetchError) {
+      console.error("❌ [PATCH] Fetch after update error:", fetchError);
       return NextResponse.json(
-        { error: "خطأ في قاعدة البيانات", details: error.message },
+        { error: "تم التحديث لكن فشل جلب البيانات", details: fetchError.message },
         { status: 500 }
       );
     }
 
-    if (!data) {
-      console.log("❌ [PATCH] Update returned null (no data)");
-      return NextResponse.json(
-        { error: "فشل تحديث الخدمة (لم يتم إرجاع بيانات)" },
-        { status: 500 }
-      );
-    }
-
-    console.log("✅ [PATCH] Update SUCCESS:", data.id);
+    console.log("✅ [PATCH] SUCCESS - returning updated service");
     console.log("🔍 [PATCH] ========== END ==========");
-    return NextResponse.json({ success: true, service: data });
+
+    return NextResponse.json({ success: true, service: freshData });
   } catch (error: any) {
     console.error("❌ [PATCH] Catch error:", error);
     return NextResponse.json(
