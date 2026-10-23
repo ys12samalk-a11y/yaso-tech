@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // ← ضيف ده
 import { motion } from "framer-motion";
 import {
   Plus,
@@ -20,7 +19,6 @@ import { formatPrice } from "@/lib/utils";
 import { ServiceDB } from "@/lib/services-db";
 
 export default function AdminServicesPage() {
-  const router = useRouter(); // ← ضيف ده
   const [services, setServices] = useState<ServiceDB[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +26,9 @@ export default function AdminServicesPage() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch("/api/admin/services?includeInactive=true");
+      const res = await fetch("/api/admin/services?includeInactive=true", {
+        cache: "no-store",
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -66,8 +66,8 @@ export default function AdminServicesPage() {
       // ✅ شيل من الشاشة فورًا
       setServices((prev) => prev.filter((s) => s.id !== id));
 
-      // ✅ الأهم: خلي Next.js يعمل Refresh للبيانات من السيرفر
-      router.refresh();
+      // ✅ إعادة تحميل كاملة للصفحة (بتتخطى الكاش)
+      window.location.reload();
     } catch (err) {
       alert(err instanceof Error ? err.message : "حدث خطأ");
     } finally {
@@ -93,8 +93,8 @@ export default function AdminServicesPage() {
         prev.map((s) => (s.id === service.id ? data.service : s))
       );
 
-      // ✅ كمان نعمل Refresh بعد تغيير الحالة
-      router.refresh();
+      // ✅ إعادة تحميل كاملة
+      window.location.reload();
     } catch (err) {
       alert(err instanceof Error ? err.message : "حدث خطأ");
     }
