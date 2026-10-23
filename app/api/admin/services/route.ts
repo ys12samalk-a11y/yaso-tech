@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+// 🛑 منع Next.js من عمل كاش لهذا الـ Route نهائيًا
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // ==================== جلب كل الخدمات ====================
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +36,17 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true, services: data || [] });
+    // إرجاع البيانات مع منع الكاش
+    return NextResponse.json(
+      { success: true, services: data || [] },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
     console.error("Fetch services error:", error);
     return NextResponse.json(
@@ -74,7 +88,6 @@ export async function POST(request: NextRequest) {
       display_order,
     } = body;
 
-    // التحقق
     if (!slug || !title_ar || !title_en || !category || !price) {
       return NextResponse.json(
         { error: "الحقول الأساسية ناقصة" },
@@ -82,7 +95,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // التحقق من الـ slug
     const slugRegex = /^[a-z0-9-]+$/;
     if (!slugRegex.test(slug)) {
       return NextResponse.json(
@@ -94,7 +106,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // التحقق إن الـ slug مش مستخدم
     const { data: existing } = await supabaseAdmin
       .from("services")
       .select("id")
@@ -108,7 +119,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // إضافة الخدمة
     const { data, error } = await supabaseAdmin
       .from("services")
       .insert({
