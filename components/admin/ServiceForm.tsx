@@ -151,15 +151,7 @@ export default function ServiceForm({
 
     setSubmitting(true);
 
-    // استخدام id الـ prop أولاً، ثم initialData.id
     const targetId = id || initialData?.id;
-
-    // 🔍 تشخيص
-    console.log("🔍 [ServiceForm] mode:", mode);
-    console.log("🔍 [ServiceForm] id prop:", id);
-    console.log("🔍 [ServiceForm] initialData?.id:", initialData?.id);
-    console.log("🔍 [ServiceForm] targetId:", targetId);
-    console.log("🔍 [ServiceForm] Full URL:", mode === "create" ? "/api/admin/services" : `/api/admin/services/${targetId}`);
 
     try {
       const url =
