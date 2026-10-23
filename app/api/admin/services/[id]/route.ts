@@ -179,23 +179,58 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    console.log("🗑️ DELETE request for ID:", id);
 
-    const { error } = await supabaseAdmin
+    // 1. نتأكد إن الخدمة موجودة
+    const { data: existing, error: checkError } = await supabaseAdmin
       .from("services")
-      .delete()
-      .eq("id", id);
+      .select("id")
+      .eq("id", id)
+      .maybeSingle();
 
-    if (error) {
-      console.error("DELETE service error:", error);
+    if (checkError) {
+      console.error("DELETE check error:", checkError);
       return NextResponse.json(
-        { error: "فشل حذف الخدمة", details: error.message },
+        { error: "خطأ في قاعدة البيانات", details: checkError.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    if (!existing) {
+      console.log("❌ Service not found:", id);
+      return NextResponse.json(
+        { error: "الخدمة غير موجودة" },
+        { status: 404 }
+      );
+    }
+
+    // 2. نحذف
+    const { error: deleteError, count } = await supabaseAdmin
+      .from("services")
+      .delete({ count: "exact" })
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("DELETE error:", deleteError);
+      return NextResponse.json(
+        { error: "فشل حذف الخدمة", details: deleteError.message },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Deleted ${count} row(s) for ID: ${id}`);
+
+    // 3. نتأكد إن الحذف تم فعلاً
+    if (count === 0) {
+      return NextResponse.json(
+        { error: "لم يتم حذف أي صف - قد تكون السياسات تمنع الحذف" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, deleted: count });
   } catch (error: any) {
-    console.error("DELETE service catch error:", error);
+    console.error("DELETE catch error:", error);
     return NextResponse.json(
       { error: "حدث خطأ في السيرفر", details: error?.message || "Unknown error" },
       { status: 500 }
