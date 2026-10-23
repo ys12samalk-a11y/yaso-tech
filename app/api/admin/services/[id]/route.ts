@@ -103,14 +103,22 @@ export async function PATCH(
       updates.features = [];
     }
 
+    // ⚠️ استخدام maybeSingle بدل single لتجنب خطأ PGRST116
     const { data, error } = await supabaseAdmin
       .from("services")
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "لم يتم العثور على الخدمة لتحديثها" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ success: true, service: data });
   } catch (error) {
