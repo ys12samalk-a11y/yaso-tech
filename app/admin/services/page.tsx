@@ -50,19 +50,28 @@ export default function AdminServicesPage() {
 
     setDeletingId(id);
 
+    // 🔍 سطر تشخيص - في المتصفح (Console)
+    console.log("🗑️ [DELETE] ID:", id);
+
     try {
       const res = await fetch(`/api/admin/services/${id}`, {
         method: "DELETE",
       });
 
+      // 🔍 نشوف الرد
+      console.log("📡 [DELETE] Response status:", res.status);
       const data = await res.json();
+      console.log("📡 [DELETE] Response data:", data);
 
       if (!res.ok) {
         throw new Error(data.error || "فشل الحذف");
       }
 
+      // نشيلها من الشاشة
       setServices((prev) => prev.filter((s) => s.id !== id));
+      console.log("✅ [DELETE] Removed from UI successfully");
     } catch (err) {
+      console.error("❌ [DELETE] Error:", err);
       alert(err instanceof Error ? err.message : "حدث خطأ");
     } finally {
       setDeletingId(null);
@@ -165,7 +174,6 @@ export default function AdminServicesPage() {
                       alt={service.title_ar}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    {/* Overlay خفيف عشان الشارات */}
                     <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-navy/40" />
                   </>
                 ) : (
@@ -176,7 +184,6 @@ export default function AdminServicesPage() {
                   </div>
                 )}
 
-                {/* شارة "مميز" */}
                 {service.featured && (
                   <div className="absolute top-2 right-2 z-10">
                     <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-2 py-1 text-xs font-bold text-navy">
@@ -186,7 +193,6 @@ export default function AdminServicesPage() {
                   </div>
                 )}
 
-                {/* شارة "معطلة" */}
                 {!service.is_active && (
                   <div className="absolute top-2 left-2 z-10">
                     <span className="rounded-full bg-red-500/90 px-2 py-1 text-xs font-bold text-white">
@@ -195,7 +201,6 @@ export default function AdminServicesPage() {
                   </div>
                 )}
 
-                {/* شارة "فيديو" */}
                 {service.video_url && (
                   <div className="absolute bottom-2 right-2 z-10">
                     <span className="inline-flex items-center gap-1 rounded-full bg-cyan/90 backdrop-blur-sm px-2 py-1 text-xs font-bold text-navy">
