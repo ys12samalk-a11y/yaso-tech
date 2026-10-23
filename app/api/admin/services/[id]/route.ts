@@ -126,7 +126,7 @@ export async function PATCH(
       );
     }
 
-    // التحديث بدون إرجاع البيانات
+    // التحديث
     const { error: updateError } = await supabaseAdmin
       .from("services")
       .update(updates)
@@ -185,13 +185,19 @@ export async function DELETE(
       .delete()
       .eq("id", id);
 
-    if (error) throw error;
+    if (error) {
+      console.error("DELETE service error:", error);
+      return NextResponse.json(
+        { error: "فشل حذف الخدمة", details: error.message },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("DELETE service error:", error);
+  } catch (error: any) {
+    console.error("DELETE service catch error:", error);
     return NextResponse.json(
-      { error: "حدث خطأ في السيرفر" },
+      { error: "حدث خطأ في السيرفر", details: error?.message || "Unknown error" },
       { status: 500 }
     );
   }
