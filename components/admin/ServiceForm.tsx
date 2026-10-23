@@ -36,21 +36,7 @@ const GRADIENTS = [
 ];
 
 const ICONS = [
-  "🎬",
-  "🎨",
-  "💻",
-  "📱",
-  "✨",
-  "🚀",
-  "🎯",
-  "💍",
-  "🎂",
-  "🍽️",
-  "📦",
-  "🌐",
-  "🛒",
-  "📊",
-  "🎥",
+  "🎬", "🎨", "💻", "📱", "✨", "🚀", "🎯", "💍", "🎂", "🍽️", "📦", "🌐", "🛒", "📊", "🎥",
 ];
 
 type FormData = {
@@ -165,7 +151,7 @@ export default function ServiceForm({
 
     setSubmitting(true);
 
-    // ✅ استخدام id الـ prop أولاً، ثم initialData.id
+    // استخدام id الـ prop أولاً، ثم initialData.id
     const targetId = id || initialData?.id;
 
     try {
@@ -208,38 +194,26 @@ export default function ServiceForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* رسائل */}
       {error && (
         <div className="flex items-start gap-3 rounded-xl border border-red-500/50 bg-red-500/10 p-4">
-          <AlertCircle
-            size={20}
-            className="text-red-400 flex-shrink-0 mt-0.5"
-          />
+          <AlertCircle size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       {success && (
         <div className="flex items-start gap-3 rounded-xl border border-green-500/50 bg-green-500/10 p-4">
-          <CheckCircle2
-            size={20}
-            className="text-green-400 flex-shrink-0 mt-0.5"
-          />
+          <CheckCircle2 size={20} className="text-green-400 flex-shrink-0 mt-0.5" />
           <p className="text-green-400 text-sm">{success}</p>
         </div>
       )}
 
-      {/* المعلومات الأساسية */}
       <div className="rounded-2xl border border-white/10 bg-navy-light/30 p-6">
-        <h2 className="text-lg font-bold text-white mb-4">
-          المعلومات الأساسية
-        </h2>
+        <h2 className="text-lg font-bold text-white mb-4">المعلومات الأساسية</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <label className="label-field">
-              الـ Slug (بالإنجليزي - بدون مسافات) *
-            </label>
+            <label className="label-field">الـ Slug (بالإنجليزي - بدون مسافات) *</label>
             <input
               type="text"
               value={form.slug}
@@ -253,9 +227,7 @@ export default function ServiceForm({
               className="input-field font-mono"
               required
             />
-            <p className="text-xs text-white/40 mt-1">
-              أحرف إنجليزية صغيرة، أرقام، وشرطات فقط
-            </p>
+            <p className="text-xs text-white/40 mt-1">أحرف إنجليزية صغيرة، أرقام، وشرطات فقط</p>
           </div>
 
           <div>
@@ -286,15 +258,11 @@ export default function ServiceForm({
             <label className="label-field">التصنيف *</label>
             <select
               value={form.category}
-              onChange={(e) =>
-                handleCategoryChange(e.target.value as ServiceCategory)
-              }
+              onChange={(e) => handleCategoryChange(e.target.value as ServiceCategory)}
               className="input-field"
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.label}
-                </option>
+                <option key={cat.id} value={cat.id}>{cat.label}</option>
               ))}
             </select>
           </div>
@@ -329,9 +297,7 @@ export default function ServiceForm({
             <input
               type="number"
               value={form.display_order}
-              onChange={(e) =>
-                updateField("display_order", Number(e.target.value))
-              }
+              onChange={(e) => updateField("display_order", Number(e.target.value))}
               placeholder="0"
               className="input-field"
             />
@@ -339,11 +305,8 @@ export default function ServiceForm({
         </div>
       </div>
 
-      {/* الوسائط */}
       <div className="rounded-2xl border border-white/10 bg-navy-light/30 p-6">
-        <h2 className="text-lg font-bold text-white mb-4">
-          🖼️ الوسائط
-        </h2>
+        <h2 className="text-lg font-bold text-white mb-4">🖼️ الوسائط</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <MediaUploader
@@ -365,20 +328,15 @@ export default function ServiceForm({
           />
         </div>
 
-        <p className="text-xs text-white/40 mt-4">
-          💡 لو مضفتش صورة، هيتعرض الإيموجي والتدرج اللوني
-        </p>
+        <p className="text-xs text-white/40 mt-4">💡 لو مضفتش صورة، هيتعرض الإيموجي والتدرج اللوني</p>
       </div>
 
-      {/* الأوصاف */}
       <div className="rounded-2xl border border-white/10 bg-navy-light/30 p-6">
         <h2 className="text-lg font-bold text-white mb-4">الأوصاف</h2>
 
         <div className="space-y-4">
           <div>
-            <label className="label-field">
-              الوصف القصير (يظهر في البطاقة) *
-            </label>
+            <label className="label-field">الوصف القصير (يظهر في البطاقة) *</label>
             <textarea
               value={form.short_description}
               onChange={(e) => updateField("short_description", e.target.value)}
@@ -390,9 +348,7 @@ export default function ServiceForm({
           </div>
 
           <div>
-            <label className="label-field">
-              الوصف الكامل (يظهر في صفحة التفاصيل) *
-            </label>
+            <label className="label-field">الوصف الكامل (يظهر في صفحة التفاصيل) *</label>
             <textarea
               value={form.full_description}
               onChange={(e) => updateField("full_description", e.target.value)}
@@ -405,18 +361,12 @@ export default function ServiceForm({
         </div>
       </div>
 
-      {/* المميزات */}
       <div className="rounded-2xl border border-white/10 bg-navy-light/30 p-6">
-        <h2 className="text-lg font-bold text-white mb-4">
-          المميزات ({form.features.length})
-        </h2>
+        <h2 className="text-lg font-bold text-white mb-4">المميزات ({form.features.length})</h2>
 
         <div className="space-y-3 mb-4">
           {form.features.map((feature, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 rounded-lg border border-white/10 bg-navy p-3"
-            >
+            <div key={index} className="flex items-center gap-3 rounded-lg border border-white/10 bg-navy p-3">
               <CheckCircle2 size={16} className="text-cyan flex-shrink-0" />
               <p className="flex-1 text-white text-sm">{feature}</p>
               <button
@@ -454,7 +404,6 @@ export default function ServiceForm({
         </div>
       </div>
 
-      {/* المظهر */}
       <div className="rounded-2xl border border-white/10 bg-navy-light/30 p-6">
         <h2 className="text-lg font-bold text-white mb-4">المظهر</h2>
 
@@ -467,9 +416,7 @@ export default function ServiceForm({
               className="input-field"
             >
               {GRADIENTS.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
-                </option>
+                <option key={g.value} value={g.value}>{g.label}</option>
               ))}
             </select>
           </div>
@@ -483,9 +430,7 @@ export default function ServiceForm({
                   type="button"
                   onClick={() => updateField("icon", icon)}
                   className={`flex h-10 w-10 items-center justify-center rounded-lg border text-xl transition-all ${
-                    form.icon === icon
-                      ? "border-cyan bg-cyan/20"
-                      : "border-white/10 bg-navy hover:border-cyan/50"
+                    form.icon === icon ? "border-cyan bg-cyan/20" : "border-white/10 bg-navy hover:border-cyan/50"
                   }`}
                 >
                   {icon}
@@ -495,15 +440,11 @@ export default function ServiceForm({
           </div>
         </div>
 
-        {/* معاينة */}
-        <div
-          className={`relative aspect-video w-full rounded-xl bg-gradient-to-br ${form.cover_gradient} overflow-hidden mb-4`}
-        >
+        <div className={`relative aspect-video w-full rounded-xl bg-gradient-to-br ${form.cover_gradient} overflow-hidden mb-4`}>
           <div
             className="absolute inset-0 opacity-20"
             style={{
-              backgroundImage: `linear-gradient(#ffffff30 1px, transparent 1px),
-                                linear-gradient(90deg, #ffffff30 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(#ffffff30 1px, transparent 1px), linear-gradient(90deg, #ffffff30 1px, transparent 1px)`,
               backgroundSize: "24px 24px",
             }}
           />
@@ -535,13 +476,8 @@ export default function ServiceForm({
         </div>
       </div>
 
-      {/* الأزرار */}
       <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="btn-primary flex-1 py-4 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="btn-primary flex-1 py-4 disabled:opacity-50">
           {submitting ? (
             <>
               <Loader2 size={20} className="animate-spin" />
