@@ -77,9 +77,11 @@ type FormData = {
 export default function ServiceForm({
   initialData,
   mode = "create",
+  id,
 }: {
   initialData?: ServiceDB | null;
   mode?: "create" | "edit";
+  id?: string;
 }) {
   const router = useRouter();
 
@@ -163,11 +165,14 @@ export default function ServiceForm({
 
     setSubmitting(true);
 
+    // ✅ استخدام id الـ prop أولاً، ثم initialData.id
+    const targetId = id || initialData?.id;
+
     try {
       const url =
         mode === "create"
           ? "/api/admin/services"
-          : `/api/admin/services/${initialData?.id}`;
+          : `/api/admin/services/${targetId}`;
 
       const method = mode === "create" ? "POST" : "PATCH";
 

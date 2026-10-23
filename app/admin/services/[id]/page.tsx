@@ -82,7 +82,8 @@ export default function EditServicePage({
         <p className="text-white/60 font-mono">{service.title_en}</p>
       </div>
 
-      <ServiceForm mode="edit" initialData={service} />
+      {/* ✅ تمرير الـ id من الـ URL مباشرة إلى الفورم */}
+      <ServiceForm mode="edit" initialData={service} id={id} />
     </div>
   );
 }
